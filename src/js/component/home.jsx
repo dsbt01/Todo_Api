@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 let globalList = [];
 let index = -1;
@@ -52,9 +52,42 @@ const Home = () => {
 
   function keyPress(e) {
     if (e.keyCode === 13) {
-      addTodo();
+      //addTodo();
     }
   }
+
+  useEffect(() => {
+    fetch("https://assets.breatheco.de/apis/fake/todos/user/DSBT", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        }
+        // Read the response as json.
+        return response.json();
+      })
+      .then((responseAsJson) => {
+        // Do stuff with the JSONified response
+
+        console.log(responseAsJson);
+
+        for (let i = 0; i < responseAsJson.length; i++) {
+			console.log(responseAsJson[i]);
+          globalList.push(responseAsJson[i]);
+        }
+
+		setCount((c) => c + 1);
+
+        console.log(globalList);
+      })
+      .catch((error) => {
+        console.log("Looks like there was a problem: \n", error);
+      });
+  }, []);
 
   return (
     <div className="container">
@@ -78,13 +111,13 @@ const Home = () => {
           </div>
           <ul id="my-list" className="todo-container">
             {globalList.length > 0 ? (
-              globalList.map((item) => (
-                <li key={item.id}>
-                  <span>{item.text}</span>
+              globalList.map((item, index) => (
+                <li key={index}>
+                  <span>{item.label}</span>
                   <button
                     id="delete-btn"
                     type="button"
-                    onClick={() => handleRemove(item.id)}
+                    onClick={() => handleRemove(index)}
                   >
                     X
                   </button>
