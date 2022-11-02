@@ -40,23 +40,27 @@ const Home = () => {
       index += 1;
 
       let newItem = {
-        id: index,
-        text: inputValue,
+        done: false,
+        label: inputValue,
       };
 
       globalList.push(newItem);
 
+      //now push the value to the web api
+
       setInputValue("");
+
+	  RefreshData();
     }
   }
 
   function keyPress(e) {
     if (e.keyCode === 13) {
-      //addTodo();
+      addTodo();
     }
   }
 
-  useEffect(() => {
+  function RefreshData() {
     fetch("https://assets.breatheco.de/apis/fake/todos/user/DSBT", {
       method: "GET",
       headers: {
@@ -71,23 +75,20 @@ const Home = () => {
         return response.json();
       })
       .then((responseAsJson) => {
-        // Do stuff with the JSONified response
-
-        console.log(responseAsJson);
-
         for (let i = 0; i < responseAsJson.length; i++) {
-			console.log(responseAsJson[i]);
+          console.log(responseAsJson[i]);
           globalList.push(responseAsJson[i]);
         }
 
-		setCount((c) => c + 1);
-
-        console.log(globalList);
+        //refresh screen
+        setCount((c) => c + 1);
       })
       .catch((error) => {
         console.log("Looks like there was a problem: \n", error);
       });
-  }, []);
+  }
+
+  useEffect(() => {RefreshData();}, []);
 
   return (
     <div className="container">
